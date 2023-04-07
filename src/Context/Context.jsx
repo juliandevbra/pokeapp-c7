@@ -17,6 +17,7 @@ const themes = {
 
 const initialThemeState = themes.light
 const initialFavState = JSON.parse(localStorage.getItem('favs')) || []
+const initialApiState = {pokeList: [], pokeDetail: {}}
 
 const themeReducer = (state, action) => {
     switch(action.type){
@@ -28,6 +29,7 @@ const themeReducer = (state, action) => {
             throw new Error
     }
 }
+
 const favReducer = (state, action) => {
     switch(action.type){
         case 'ADD_FAV': 
@@ -37,12 +39,21 @@ const favReducer = (state, action) => {
     }
 }
 
+const apiReducer = (state, action) => {
+    switch (action.type){
+        case 'GET_POKES':
+            return {pokeList: action.payload, pokeDetail: state.pokeDetail}
+        case 'GET_POKE':
+            return {pokeDetail: action.payload, pokeList: state.pokeList}
+    }
+}
+
 const Context = ({children}) => {
 
     const [themeState, themeDispatch] = useReducer(themeReducer, initialThemeState)
     const [favState, favDispatch] = useReducer(favReducer, initialFavState)
-    console.log(favState)
-    const [pokeList, setPokeList] = useState([])
+    const [apiState, apiDispatch] = useReducer(apiReducer, initialApiState)
+    console.log('Esto es agregado de la clase 24')
     const url = 'https://pokeapi.co/api/v2/pokemon?limit=10&offset=0'
 
     useEffect(() => {
@@ -52,11 +63,11 @@ const Context = ({children}) => {
     useEffect(() => {
         fetch(url)
         .then(res => res.json())
-        .then(data => setPokeList(data.results))
+        .then(data => apiDispatch({type: 'GET_POKES', payload: data.results}))
     }, [])
 
     return(
-        <PokeStates.Provider value={{pokeList, setPokeList, themeState, themeDispatch, favState, favDispatch}}>
+        <PokeStates.Provider value={{apiState, apiDispatch, themeState, themeDispatch, favState, favDispatch}}>
             {children}
         </PokeStates.Provider>
     )
