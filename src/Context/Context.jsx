@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useReducer } from "react";
+import Swal from "sweetalert2";
 
 const PokeStates = createContext()
 
@@ -53,7 +54,7 @@ const Context = ({children}) => {
     const [themeState, themeDispatch] = useReducer(themeReducer, initialThemeState)
     const [favState, favDispatch] = useReducer(favReducer, initialFavState)
     const [apiState, apiDispatch] = useReducer(apiReducer, initialApiState)
-    console.log('Esto es agregado de la clase 24')
+
     const url = 'https://pokeapi.co/api/v2/pokemon?limit=10&offset=0'
 
     useEffect(() => {
@@ -64,6 +65,7 @@ const Context = ({children}) => {
         fetch(url)
         .then(res => res.json())
         .then(data => apiDispatch({type: 'GET_POKES', payload: data.results}))
+        .catch(err => Swal.fire('Oops...', 'Ha ocurrido el siguiente error: ' + err, 'error'))
     }, [])
 
     return(
